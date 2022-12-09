@@ -1,1 +1,171 @@
 
+db = db.getSiblingDB("MockDB");
+//db.getCollection("Supplies").find({});
+
+//db.getCollection("Supplies").findOne();
+//db.getCollection("Supplies").find({"customer.age":{$gt: 60}});
+
+db.getCollection("Supplies").explain("executionStats").find({"customer.age":{$gt: 60}});
+////create a index
+//db.getCollection("Supplies").createIndex({"customer.age":1});
+////drop index
+//db.getCollection("Supplies").dropIndex({"customer.age":1});
+
+//compound index
+db.getCollection("Supplies").dropIndex({"customer.age":1,"customer.gender":1})
+
+db.getCollection("Supplies").explain("executionStats").find({"customer.gender":"M"});
+db.getCollection("Supplies").createIndex({"customer.gender":1});
+
+db.getCollection("Supplies").createIndex({"customer.age":1,"customer.gender":1});
+db.getCollection("Supplies").explain().find({"customer.gender":"M"});
+
+db.getCollection("Supplies").find({"customer.age":35});
+
+db.getCollection("Supplies").findOne();
+
+db.getCollection("Supplies").createIndex({"customer.email":1},{unique:true});
+
+db.getCollection("Supplies").createIndex({"customer.age":1},{partialFilterExpression:{"customer.gender":"M"}});
+
+db.getCollection("Supplies").explain().find({"customer.age":{$gt:60},"customer.gender":"M"});
+
+
+//when you trie to insert entry without email, it says i already have an entry without email and you have unique index on email
+db.users.insertOne({name:"Anna"});
+
+
+db.users.find();
+
+//i want index only for entries where email field exists
+db.users.createIndex({email:1},{unique:true, partialFilterExpression:{email:{$exists:true}}})
+
+db.users.dropIndex({email:1})
+
+
+
+db.sessions.insertOne({data:"test",createdAt:new Date()});
+
+
+db.sessions.find();
+
+
+//it works on single indexes and only on date objects
+db.sessions.createIndex({createdAt:1},{expireAfterSeconds:10});
+
+
+db.customers.insertMany([{name:"Max",age:29,salary:3000},{name:"Manu",age:29,salary:4000}])
+
+db.customers.find();
+
+db.customers.createIndex({name:1})
+
+
+//this basically skipped document Examining, because you have already defined search space via index
+db.customers.explain("executionStats").find({name:"Max"},{_id:0,name:1});
+
+db.customers.getIndexes();
+db.customers.createIndex({age:1,name:1})
+db.customers.explain("allPlansExecution").find({name:"Max",age:30})
+
+db.customers.dropIndex({"name":1})
+
+
+db.contacts.insertOne({name:"Max",hobbies:["Cooking","Sports"],addresses:[{street:"Main Street"},{street:"Second Street"}]});
+
+db.contacts.findOne();
+
+db.contacts.createIndex({hobbies:1});
+
+db.contacts.explain("executionStats").find({hobbies:"Sports"})
+
+db.contacts.createIndex({addresses:1});
+
+db.contacts.find();
+
+//it does collection scan becuse street is an again a document in collection
+db.contacts.explain("executionStats").find({"addresses.street":"Main Street"})
+
+//now it does index scan
+db.contacts.explain("executionStats").find({"addresses":{"street":"Main Street"}})
+db.contacts.createIndex({"addresses.street":1})
+db.contacts.find();
+
+
+db.contacts.createIndex({name:1,hobbies:1});
+
+//doesnt support withe multiple arrays
+db.contacts.createIndex({addresses:1,hobbies:1});
+
+db.contacts.find();
+db.contacts.getIndexes();
+
+db.products.insertMany([{title:"A Book",description:"This is an awesome book by an young artist"}
+,{title:"Red T-Shirt",description:"This T-Shirt is red and it is pretty Awesome!"}]);
+
+
+//text based index
+db.products.createIndex({description:"text"});
+
+
+
+
+db.products.find({$text:{$search:"\"awesome book\""}});
+
+
+db.products.find({$text:{$search:"red book"}});
+
+
+db.products.find({$text:{$search:"awesome t-shirt"}},{score:{$meta:"textScore"}}).sort({score:{$meta:"textScore"}});
+
+
+
+db.products.findOne()
+
+db.products.insertOne({title:"A ship", description:"Floats Perfectly"})
+
+db.products.find();
+
+db.products.createIndex({title:"text",description:"text"});
+db.products.createIndex({title:"text"});
+
+db.products.dropIndex("description_text")
+
+
+db.products.getIndexes();
+
+db.products.find({$text:{$search:"ship"}})
+
+db.products.find();
+
+db.products.find({$text:{$search:"awesome"}})
+
+//exclude t-shirt
+db.products.find({$text:{$search:"awesome -t-shirt"}})
+
+
+db.products.getIndexes();
+
+db.products.dropIndex("title_text_description_text");
+
+
+db.products.createIndex({title:"text",description:"text"},{default_language:"english",weights:{title:1, description:10}});
+
+
+
+
+db.products.find({$text:{$search:"red"}},{score:{$meta:"textScore"}})
+
+
+db.products.getIndexes();
+
+db.products.dropIndex("title_text_description_text")
+
+db.products.createIndex({title:"text",description:"text"},{default_language:"english"});
+
+
+db.ratings.count();
+
+
+
+
