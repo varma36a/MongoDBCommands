@@ -1,0 +1,123 @@
+C:\Program Files\MongoDB\Server\6.0\data\
+https://gist.github.com/codeSTACKr/53fd03c7f75d40d07797b8e4e47d78ec
+
+net stop MongoDB
+net start MongoDB
+
+mongosh "YOUR_CONNECTION_STRING" --username YOUR_USER_NAME
+
+db.dropDatabase()
+db.createCollection('posts')
+show dbs
+show collections
+
+
+
+
+use shop
+db.products.insertOne({name:"Max", age:"29"})
+db.products.insertOne({name:"A Computer", price:"30.40", description:"This is high", details:{cpu:"Intel I7",memory:"32GB"}})
+db.products.find().pretty()
+*insertions
+db.students.insertMany(
+[{ "_id" : "01001", "city" : "AGAWAM", "loc" : [ -72.622739, 42.070206 ], "pop" : 15338, "state" : "MA" }],
+[{ "_id" : "01002", "city" : "CUSHMAN", "loc" : [ -72.51564999999999, 42.377017 ], "pop" : 36963, "state" : "MA" }],
+[{ "_id" : "01005", "city" : "BARRE", "loc" : [ -72.10835400000001, 42.409698 ], "pop" : 4546, "state" : "MA" }],
+[{ "_id" : "01007", "city" : "BELCHERTOWN", "loc" : [ -72.41095300000001, 42.275103 ], "pop" : 10579, "state" : "MA" }],
+[{ "_id" : "01008", "city" : "BLANDFORD", "loc" : [ -72.936114, 42.182949 ], "pop" : 1240, "state" : "MA" }],
+[{ "_id" : "01010", "city" : "BRIMFIELD", "loc" : [ -72.188455, 42.116543 ], "pop" : 3706, "state" : "MA" }],
+
+)
+db.books.insertOne({title:"The way of Kings",author:"Brandon",rating:"9",pagets:"400",generes:["fantasy"], reviews:[{name:"Yoshi",body:"Great book!"},{name:"mario",body:"So So"}]})
+
+
+
+*find
+db.products.find()
+
+*prints top 20
+*if we want more it
+
+
+
+*limit certain colums
+db.posts.find({likes:5},{category:1, tags:1})
+
+
+*add more filters
+db.posts.find({category:"News", likes:5})
+
+
+*find based on ID
+db.posts.findOne({_id:ObjectId("639040c9a7662076c57ada87")})
+
+
+*counting the docs
+db.posts.find().count()
+
+*chaining
+db.posts.find({category:"News"}).count()
+
+
+*limit documents
+db.posts.find().limit(3)
+db.posts.find({category:"News"}).limit(1)
+
+*sort in ASC
+db.posts.find().sort({ title: 1 })
+db.posts.find().sort({ title: 1 }).limit(1);
+
+*sort in DESC
+db.posts.find().sort({ title: -1 })
+db.posts.find().sort({ title: -1 }).limit(1);
+
+
+*greater than but not equal to
+db.books.find({pageCount:{$gt:624}, _id:24})
+db.books.find({pageCount:{$lt:624}})
+
+{$and:[{status:"PUBLISH"},{isbn:"1933988673"}]}
+
+{$or:[{status:"PUBLISH"},{isbn:"1933988673"}]}
+
+{$or:[pageCount:{$gt:624}]}
+
+{$and:[{pageCount:{$gt:624}},{status:"PUBLISH"}]}
+
+
+db.getCollection("Supplies").aggregate(
+    [
+        {
+            "$match" : {
+                "storeLocation" : "London"
+            },
+            
+        },
+        {"$group":{_id:{ gender:"$customer.gender" },totalPersons:{$sum:1}}}
+    ], 
+    {
+        "allowDiskUse" : false
+    }
+).pretty();
+
+
+db.getCollection("Supplies").find(
+    {
+        "storeLocation" : /.*London.*/i
+    }, 
+    {
+        "_id" : 1.0,
+        "saleDate" : 1.0,
+        "storeLocation" : 1.0,
+        "items" : 1.0
+    }
+).sort(
+    {
+        "saleDate" : -1.0
+    }
+);
+
+
+
+
+
